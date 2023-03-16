@@ -1,3 +1,6 @@
+"""MNIST dataset utilities for federated learning."""
+
+
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -7,23 +10,7 @@ from torch.utils.data import ConcatDataset, DataLoader, Dataset, Subset, random_
 from torchvision.datasets import MNIST
 
 
-def centralized_loaders(batch_size, val_ratio, seed):
-    trainset, testset = _download_data()
-
-    len_val = int(len(trainset) / (1 / val_ratio))
-    lengths = [len(trainset) - len_val, len_val]
-    ds_train, ds_val = random_split(
-        trainset, lengths, torch.Generator().manual_seed(seed)
-    )
-
-    return (
-        DataLoader(ds_train, batch_size=batch_size),
-        DataLoader(ds_val, batch_size=batch_size),
-        DataLoader(testset, batch_size=batch_size),
-    )
-
-
-def distributed_loaders(
+def load_datasets(  # pylint: disable=too-many-arguments
     num_clients: int = 10,
     iid: Optional[bool] = True,
     balance: Optional[bool] = True,
@@ -72,7 +59,7 @@ def distributed_loaders(
     return trainloaders, valloaders, DataLoader(testset, batch_size=batch_size)
 
 
-def _download_data() -> Tuple[MNIST, MNIST]:
+def _download_data() -> Tuple[Dataset, Dataset]:
     """Downloads (if necessary) and returns the MNIST dataset.
 
     Returns
@@ -83,8 +70,8 @@ def _download_data() -> Tuple[MNIST, MNIST]:
     transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
     )
-    trainset = MNIST("./.dataset", train=True, download=True, transform=transform)
-    testset = MNIST("./.dataset", train=False, download=True, transform=transform)
+    trainset = MNIST("./dataset", train=True, download=True, transform=transform)
+    testset = MNIST("./dataset", train=False, download=True, transform=transform)
     return trainset, testset
 
 
@@ -93,7 +80,7 @@ def _partition_data(
     iid: Optional[bool] = True,
     balance: Optional[bool] = True,
     seed: Optional[int] = 42,
-) -> Tuple[List[MNIST], MNIST]:
+) -> Tuple[List[Dataset], Dataset]:
     """Split training set into iid or non iid partitions to simulate the
     federated setting.
 

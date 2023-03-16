@@ -1,11 +1,11 @@
-from src.dataset.MNIST import get_loaders
+from src.dataset.MNIST import centralized_loaders
 from src.model.MNIST_CNN import Net
 from src.model.common import train, test
 import conf.parameters as params
 
 
 def main():
-    train_loader, val_loader, test_loader = get_loaders(
+    train_loader, val_loader, test_loader = centralized_loaders(
         params.BATCH_SIZE, params.VAL_RATIO, params.SEED
     )
 
