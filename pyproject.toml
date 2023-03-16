@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "cs439-miniproject"
+version = "0.1.0"
+description = ""
+authors = ["charlesbvll <charles.beauville@epfl.ch>"]
+readme = "README.md"
+packages = [{include = "cs439_miniproject"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.0.0"
+tqdm = "^4.65.0"
+torchvision = "^0.15.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
