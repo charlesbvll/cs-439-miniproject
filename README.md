@@ -2,7 +2,7 @@
 Project for the CS-439 course (Optimization for Machine Learning).
 
 ## Plan of action
-- [ ] Get familiar with [Flower](https://github.com/adap/flower) 
+- [x] Get familiar with [Flower](https://github.com/adap/flower) 
 
 - [x] Centralized setting
 
@@ -12,15 +12,27 @@ Project for the CS-439 course (Optimization for Machine Learning).
   
   - [x] Implement PyTorch testing
 
-- [ ] Distributed setting
+- [x] Distributed setting
 
-  - [ ] Implement Flower Client 
+  - [x] Implement Flower Client 
 
-  - [ ] Write data partitionning methods
+  - [x] Write data partitionning methods
   
-  - [ ] Distribute data amongst clients
+  - [x] Distribute data amongst clients
   
 - [ ] Write plotting functions
+ 
+  - [x] Distributed setting
+  
+  - [ ] Centralized setting
+  
+- [ ] Use parser to set parameters
+
+- [ ] Use config manager
+
+- [ ] Make optimizer modular
+
+- [ ] Write custom optimizer
 
 - [ ] Play around with different methods
 
