@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["charlesbvll <charles.beauville@epfl.ch>"]
 readme = "README.md"
-packages = [{include = "cs439_miniproject"}]
+packages = [{include = "cs439_miniproject/src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"

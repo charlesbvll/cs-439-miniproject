@@ -1,28 +1,29 @@
-from data import get_loaders
-from model import Net, train, test
-import parameters
+from src.dataset.MNIST import get_loaders
+from src.model.MNIST_CNN import Net
+from src.model.common import train, test
+import conf.parameters as params
 
 
 def main():
     train_loader, val_loader, test_loader = get_loaders(
-        parameters.BATCH_SIZE, parameters.VAL_RATIO, parameters.SEED
+        params.BATCH_SIZE, params.VAL_RATIO, params.SEED
     )
 
-    net = Net().to(parameters.DEVICE)
+    net = Net().to(params.DEVICE)
 
-    for round in range(parameters.NUM_ROUNDS):
+    for round in range(params.NUM_ROUNDS):
         print(f"Strating round {round}...")
         train(
             net,
             train_loader,
-            parameters.DEVICE,
-            parameters.NUM_EPOCHS,
-            parameters.LR,
-            parameters.PROXIMAL_MU,
+            params.DEVICE,
+            params.NUM_EPOCHS,
+            params.LR,
+            params.PROXIMAL_MU,
         )
-        print(f"Validation results: {test(net, val_loader, parameters.DEVICE)}")
+        print(f"Validation results: {test(net, val_loader, params.DEVICE)}")
 
-    print(f"Test results: {test(net, test_loader, parameters.DEVICE)}")
+    print(f"Test results: {test(net, test_loader, params.DEVICE)}")
 
 
 if __name__ == "__main__":
