@@ -1,6 +1,6 @@
 import torch
 
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda:0")
 NUM_ROUNDS = 1
 NUM_EPOCHS = 5
 LR = 0.001

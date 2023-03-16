@@ -1,5 +1,3 @@
-from tqdm import tqdm
-
 from data import get_loaders
 from model import Net, train, test
 import parameters
@@ -12,7 +10,7 @@ def main():
 
     net = Net().to(parameters.DEVICE)
 
-    for round in tqdm(range(parameters.NUM_ROUNDS), disable=parameters.TQDM_DISABLE):
+    for round in range(parameters.NUM_ROUNDS):
         print(f"Strating round {round}...")
         train(
             net,

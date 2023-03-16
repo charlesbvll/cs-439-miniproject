@@ -120,7 +120,7 @@ def _training_loop(  # pylint: disable=too-many-arguments
     nn.Module
         The model that has been trained for one epoch.
     """
-    for images, labels in trainloader:
+    for images, labels in tqdm(trainloader, disable=TQDM_DISABLE, leave=False):
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         proximal_term = 0.0
