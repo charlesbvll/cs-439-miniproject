@@ -9,6 +9,8 @@ import numpy as np
 import conf.parameters as params
 import src.client as client
 import src.utils as utils
+from src.model.optimizer import sgd
+
 
 def main() -> None:
     client_fn, testloader = client.gen_client_fn(
@@ -19,6 +21,7 @@ def main() -> None:
         num_rounds=params.NUM_ROUNDS,
         iid=params.IID,
         balance=params.BALANCE,
+        optimizer=sgd(),
         learning_rate=params.LR,
         stagglers=params.STAGGLERS_FRACTION,
     )

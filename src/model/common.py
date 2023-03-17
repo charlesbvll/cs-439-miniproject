@@ -14,6 +14,7 @@ from conf.parameters import TQDM_DISABLE
 def train(  # pylint: disable=too-many-arguments
     net: nn.Module,
     trainloader: DataLoader,
+    optimizer: torch.optim,
     device: torch.device,
     epochs: int,
     learning_rate: float,
@@ -37,7 +38,7 @@ def train(  # pylint: disable=too-many-arguments
         Parameter for the weight of the proximal term.
     """
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
+    optimizer = optimizer(net.parameters(), lr=learning_rate)
     global_params = [val.detach().clone() for val in net.parameters()]
     net.train()
     for _ in tqdm(range(epochs), disable=TQDM_DISABLE):
@@ -52,7 +53,7 @@ def _training_loop(  # pylint: disable=too-many-arguments
     trainloader: DataLoader,
     device: torch.device,
     criterion: torch.nn.CrossEntropyLoss,
-    optimizer: torch.optim.SGD,
+    optimizer: torch.optim,
     proximal_mu: float,
 ) -> nn.Module:
     """Train for one epoch.

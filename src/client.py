@@ -25,6 +25,7 @@ class FlowerClient(
         net: torch.nn.Module,
         trainloader: DataLoader,
         valloader: DataLoader,
+        optimizer: torch.optim,
         device: torch.device,
         num_epochs: int,
         learning_rate: float,
@@ -33,6 +34,7 @@ class FlowerClient(
         self.net = net
         self.trainloader = trainloader
         self.valloader = valloader
+        self.optimizer = optimizer
         self.device = device
         self.num_epochs = num_epochs
         self.learning_rate = learning_rate
@@ -67,6 +69,7 @@ class FlowerClient(
         train(
             self.net,
             self.trainloader,
+            self.optimizer,
             self.device,
             epochs=num_epochs,
             learning_rate=self.learning_rate,
@@ -92,6 +95,7 @@ def gen_client_fn(
     num_rounds: int,
     num_epochs: int,
     batch_size: int,
+    optimizer: torch.optim,
     learning_rate: float,
     stagglers: float,
 ) -> Tuple[
@@ -158,6 +162,7 @@ def gen_client_fn(
             net,
             trainloader,
             valloader,
+            optimizer,
             device,
             num_epochs,
             learning_rate,

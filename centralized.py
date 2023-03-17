@@ -1,7 +1,8 @@
-from src.dataset.MNIST import centralized_loaders
-from src.model.MNIST_CNN import Net
-from src.model.common import train, test
 import conf.parameters as params
+from src.dataset.MNIST import centralized_loaders
+from src.model.common import test, train
+from src.model.MNIST_CNN import Net
+from src.model.optimizer import sgd
 
 
 def main():
@@ -16,6 +17,7 @@ def main():
         train(
             net,
             train_loader,
+            sgd(),
             params.DEVICE,
             params.NUM_EPOCHS,
             params.LR,
