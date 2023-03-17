@@ -50,7 +50,15 @@ To run the MNIST digit recognition task in a centralized setting, the following 
 python centralized.py
 ```
 
-Many of the parameters can be changed inside the `parameters.py` file.
+## Distributed setting
 
+To run MNIST digit recognition task in a distributed setting, the following command can be used:
 
+```sh
+python distributed.py
+```
+
+## Changing parameters
+
+The `--help` flag can be used to display the different parameters that can be changed.
 
