@@ -30,7 +30,7 @@ Project for the CS-439 course (Optimization for Machine Learning).
 
 - [ ] Use config manager
 
-- [ ] Make optimizer modular
+- [x] Make optimizer modular
 
 - [ ] Write custom optimizer
 
