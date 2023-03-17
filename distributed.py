@@ -59,6 +59,7 @@ def main(params) -> None:
         f"_R={params.NUM_ROUNDS}"
         f"_mu={params.PROXIMAL_MU}"
         f"_stag={params.STRAGGLERS_FRACTION}"
+        f"_O={params.OPTIMIZER}"
     )
 
     np.save(
@@ -66,10 +67,11 @@ def main(params) -> None:
         history,  # type: ignore
     )
 
-    utils.plot_metric_from_history(
-        history,
+    utils.plot_metric_from_dict(
+        history.metrics_centralized,
         Path(params.SAVE_PATH),
-        (file_suffix),
+        f"_centralized_{file_suffix}",
+        "accuracy",
     )
 
 

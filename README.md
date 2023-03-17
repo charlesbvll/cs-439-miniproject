@@ -20,13 +20,13 @@ Project for the CS-439 course (Optimization for Machine Learning).
   
   - [x] Distribute data amongst clients
   
-- [ ] Write plotting functions
+- [x] Write plotting functions
  
   - [x] Distributed setting
   
-  - [ ] Centralized setting
+  - [x] Centralized setting
   
-- [ ] Use parser to set parameters
+- [x] Use parser to set parameters
 
 - [x] Use config manager
 

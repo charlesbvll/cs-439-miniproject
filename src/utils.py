@@ -16,10 +16,12 @@ from torch.utils.data import DataLoader
 from src.model.MNIST_CNN import Net
 from src.model.common import test
 
-def plot_metric_from_history(
-    hist: History,
+
+def plot_metric_from_dict(
+    dict: Dict[str, List[Tuple[int, float]]],
     save_plot_path: Path,
-    suffix: Optional[str] = "",
+    suffix: str = "",
+    metric: str = "accuracy",
 ) -> None:
     """Function to plot from Flower server History.
 
@@ -32,22 +34,15 @@ def plot_metric_from_history(
     suffix: Optional[str]
         Optional string to add at the end of the filename for the plot.
     """
-    metric_type = "centralized"
-    metric_dict = (
-        hist.metrics_centralized
-        if metric_type == "centralized"
-        else hist.metrics_distributed
-    )
-    rounds, values = zip(*metric_dict["accuracy"])
+    rounds, values = zip(*dict[metric])
     plt.plot(np.asarray(rounds), np.asarray(values), label="FedProx")
-    plt.title(f"{metric_type.capitalize()} Validation - MNIST")
+    plt.title(f"Validation {metric.capitalize()} - MNIST")
     plt.xlabel("Rounds")
-    plt.ylabel("Accuracy")
+    plt.ylabel(f"{metric.capitalize()}")
     plt.legend(loc="lower right")
 
-    plt.savefig(Path(save_plot_path) / Path(f"{metric_type}_metrics{suffix}.png"))
+    plt.savefig(Path(save_plot_path) / Path(f"{metric}{suffix}.png"))
     plt.close()
-
 
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     """Aggregation function for weighted average during evaluation.

@@ -1,10 +1,14 @@
+from pathlib import Path
+
 import hydra
+import numpy as np
 import torch
 
 import src.model.optimizer as optimizer
 from src.dataset.MNIST import centralized_loaders
 from src.model.common import test, train
 from src.model.MNIST_CNN import Net
+from src.utils import plot_metric_from_dict
 
 
 @hydra.main(config_path="docs/conf", config_name="base_centralized", version_base=None)
@@ -16,6 +20,8 @@ def main(params):
     )
 
     net = Net().to(DEVICE)
+
+    results = {"accuracy": [], "loss": []}
 
     for round in range(params.NUM_ROUNDS):
         print(f"Strating round {round}...")
@@ -29,11 +35,25 @@ def main(params):
             params.PROXIMAL_MU,
             params.TQDM_DISABLE,
         )
+        loss, accuracy = test(net, val_loader, DEVICE, params.TQDM_DISABLE)
         print(
-            f"Validation results: {test(net, val_loader, DEVICE, params.TQDM_DISABLE)}"
+                f"Validation results: loss: {loss:.3f}, accuracy: {accuracy:.3f}"
         )
+        results["accuracy"].append((round, accuracy))
+        results["loss"].append((round, loss))
 
-    print(f"Test results: {test(net, test_loader, DEVICE, params.TQDM_DISABLE)}")
+    file_suffix: str = (
+        f"_B={params.BATCH_SIZE}"
+        f"_E={params.NUM_EPOCHS}"
+        f"_R={params.NUM_ROUNDS}"
+        f"_O={params.OPTIMIZER}"
+    )
+
+    np.save(Path(params.SAVE_PATH) / Path(f"hist{file_suffix}"), results)
+    plot_metric_from_dict(results, Path(params.SAVE_PATH), file_suffix, "accuracy")
+
+    loss, accuracy = test(net, test_loader, DEVICE, params.TQDM_DISABLE)
+    print(f"Test results: loss: {loss:.3f}, accuracy: {accuracy:.3f}")
 
 
 if __name__ == "__main__":

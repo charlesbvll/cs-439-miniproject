@@ -19,4 +19,4 @@ IID: False
 BALANCE: True
 STRAGGLERS_FRACTION: 0.0
 
-SAVE_PATH: "docs/results"
+SAVE_PATH: "docs/results/distributed"

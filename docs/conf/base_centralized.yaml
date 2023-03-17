@@ -1,7 +1,7 @@
 ---
 TQDM_DISABLE: False
 
-DEVICE: "cpu"
+DEVICE: "cuda"
 
 NUM_ROUNDS: 1
 NUM_EPOCHS: 5
@@ -14,4 +14,4 @@ LR: 0.1
 PROXIMAL_MU: 0.0
 OPTIMIZER: "sgd"
 
-SAVE_PATH: "docs/results"
+SAVE_PATH: "docs/results/centralized"
