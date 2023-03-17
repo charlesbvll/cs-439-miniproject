@@ -26,7 +26,7 @@ Project for the CS-439 course (Optimization for Machine Learning).
   
   - [ ] Centralized setting
   
-- [ ] Use parser to set parameters
+- [x] Use parser to set parameters
 
 - [x] Use config manager
 
