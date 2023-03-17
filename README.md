@@ -1,5 +1,6 @@
 # Exploring optimization and regularization methods in Federated Learning
-Project for the CS-439 course (Optimization for Machine Learning).
+
+Project for the CS-439 course (Optimization for Machine Learning). Check-out the description [here](docs/miniproject_description.pdf).
 
 ## Plan of action
 - [x] Get familiar with [Flower](https://github.com/adap/flower) 
