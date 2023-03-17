@@ -1,6 +1,8 @@
 .dataset
 poetry.lock
 outputs
+**/*.png
+**/*.npy
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
