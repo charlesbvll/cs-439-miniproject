@@ -71,7 +71,7 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 
 
 def gen_evaluate_fn(
-    testloader: DataLoader, device: torch.device
+        testloader: DataLoader, device: torch.device, tqdm_disable: bool
 ) -> Callable[
     [int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]
 ]:
@@ -102,7 +102,7 @@ def gen_evaluate_fn(
         net.load_state_dict(state_dict, strict=True)
         net.to(device)
 
-        loss, accuracy = test(net, testloader, device=device)
+        loss, accuracy = test(net, testloader, device=device, tqdm_disable=tqdm_disable)
         # return statistics
         return loss, {"accuracy": accuracy}
 

@@ -28,7 +28,7 @@ Project for the CS-439 course (Optimization for Machine Learning).
   
 - [ ] Use parser to set parameters
 
-- [ ] Use config manager
+- [x] Use config manager
 
 - [x] Make optimizer modular
 

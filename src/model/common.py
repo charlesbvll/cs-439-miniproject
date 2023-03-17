@@ -8,8 +8,6 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from conf.parameters import TQDM_DISABLE
-
 
 def train(  # pylint: disable=too-many-arguments
     net: nn.Module,
@@ -19,6 +17,7 @@ def train(  # pylint: disable=too-many-arguments
     epochs: int,
     learning_rate: float,
     proximal_mu: float,
+    tqdm_disable: bool,
 ) -> None:
     """Train the network on the training set.
 
@@ -41,9 +40,9 @@ def train(  # pylint: disable=too-many-arguments
     optimizer = optimizer(net.parameters(), lr=learning_rate)
     global_params = [val.detach().clone() for val in net.parameters()]
     net.train()
-    for _ in tqdm(range(epochs), disable=TQDM_DISABLE):
+    for _ in tqdm(range(epochs), disable=tqdm_disable):
         net = _training_loop(
-            net, global_params, trainloader, device, criterion, optimizer, proximal_mu
+            net, global_params, trainloader, device, criterion, optimizer, proximal_mu, tqdm_disable
         )
 
 
@@ -55,6 +54,7 @@ def _training_loop(  # pylint: disable=too-many-arguments
     criterion: torch.nn.CrossEntropyLoss,
     optimizer: torch.optim,
     proximal_mu: float,
+    tqdm_disable: bool,
 ) -> nn.Module:
     """Train for one epoch.
 
@@ -80,7 +80,7 @@ def _training_loop(  # pylint: disable=too-many-arguments
     nn.Module
         The model that has been trained for one epoch.
     """
-    for images, labels in tqdm(trainloader, disable=TQDM_DISABLE, leave=False):
+    for images, labels in tqdm(trainloader, disable=tqdm_disable, leave=False):
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         proximal_term = 0.0
@@ -93,7 +93,7 @@ def _training_loop(  # pylint: disable=too-many-arguments
 
 
 def test(
-    net: nn.Module, testloader: DataLoader, device: torch.device
+        net: nn.Module, testloader: DataLoader, device: torch.device, tqdm_disable: bool
 ) -> Tuple[float, float]:
     """Evaluate the network on the entire test set.
 
@@ -115,7 +115,7 @@ def test(
     correct, total, loss = 0, 0, 0.0
     net.eval()
     with torch.no_grad():
-        for images, labels in tqdm(testloader, disable=TQDM_DISABLE):
+        for images, labels in tqdm(testloader, disable=tqdm_disable):
             images, labels = images.to(device), labels.to(device)
             outputs = net(images)
             loss += criterion(outputs, labels).item()

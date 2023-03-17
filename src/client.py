@@ -30,6 +30,7 @@ class FlowerClient(
         num_epochs: int,
         learning_rate: float,
         staggler_schedule: np.ndarray,
+        tqdm_disable: bool
     ):  # pylint: disable=too-many-arguments
         self.net = net
         self.trainloader = trainloader
@@ -39,6 +40,7 @@ class FlowerClient(
         self.num_epochs = num_epochs
         self.learning_rate = learning_rate
         self.staggler_schedule = staggler_schedule
+        self.tqdm_disable = tqdm_disable
 
     def get_parameters(self, config: Dict[str, Scalar]) -> NDArrays:
         """Returns the parameters of the current net."""
@@ -74,6 +76,7 @@ class FlowerClient(
             epochs=num_epochs,
             learning_rate=self.learning_rate,
             proximal_mu=config["proximal_mu"],
+            tqdm_disable=self.tqdm_disable
         )
 
         return self.get_parameters({}), len(self.trainloader), {}
@@ -83,7 +86,7 @@ class FlowerClient(
     ) -> Tuple[float, int, Dict]:
         """Implements distributed evaluation for a given client."""
         self.set_parameters(parameters)
-        loss, accuracy = test(self.net, self.valloader, self.device)
+        loss, accuracy = test(self.net, self.valloader, self.device, self.tqdm_disable)
         return float(loss), len(self.valloader), {"accuracy": float(accuracy)}
 
 
@@ -98,6 +101,7 @@ def gen_client_fn(
     optimizer: torch.optim,
     learning_rate: float,
     stagglers: float,
+    tqdm_disable: bool
 ) -> Tuple[
     Callable[[str], FlowerClient], DataLoader
 ]:  # pylint: disable=too-many-arguments
@@ -167,6 +171,7 @@ def gen_client_fn(
             num_epochs,
             learning_rate,
             stagglers_mat[int(cid)],
+            tqdm_disable
         )
 
     return client_fn, testloader

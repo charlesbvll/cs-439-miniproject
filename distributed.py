@@ -1,18 +1,19 @@
-"""Runs CNN federated learning for MNIST dataset."""
-
-
 from pathlib import Path
 
 import flwr as fl
+import hydra
 import numpy as np
+import torch
 
-import conf.parameters as params
 import src.client as client
+import src.model.optimizer as optimizer
 import src.utils as utils
-from src.model.optimizer import sgd
 
 
-def main() -> None:
+@hydra.main(config_path="docs/conf", config_name="base_distributed", version_base=None)
+def main(params) -> None:
+    DEVICE = torch.device(params.DEVICE)
+
     client_fn, testloader = client.gen_client_fn(
         num_epochs=params.NUM_EPOCHS,
         batch_size=params.BATCH_SIZE,
@@ -21,17 +22,18 @@ def main() -> None:
         num_rounds=params.NUM_ROUNDS,
         iid=params.IID,
         balance=params.BALANCE,
-        optimizer=sgd(),
+        optimizer=optimizer.get(params.OPTIMIZER),
         learning_rate=params.LR,
-        stagglers=params.STAGGLERS_FRACTION,
+        stagglers=params.STRAGGLERS_FRACTION,
+        tqdm_disable=params.TQDM_DISABLE,
     )
 
-    evaluate_fn = utils.gen_evaluate_fn(testloader, params.DEVICE)
+    evaluate_fn = utils.gen_evaluate_fn(testloader, DEVICE, params.TQDM_DISABLE)
 
     strategy = fl.server.strategy.FedProx(
         fraction_fit=1.0,
         fraction_evaluate=0.0,
-        min_fit_clients=int(params.NUM_CLIENTS * (1 - params.STAGGLERS_FRACTION)),
+        min_fit_clients=int(params.NUM_CLIENTS * (1 - params.STRAGGLERS_FRACTION)),
         min_evaluate_clients=0,
         min_available_clients=params.NUM_CLIENTS,
         on_fit_config_fn=lambda curr_round: {"curr_round": curr_round},
@@ -56,7 +58,7 @@ def main() -> None:
         f"_E={params.NUM_EPOCHS}"
         f"_R={params.NUM_ROUNDS}"
         f"_mu={params.PROXIMAL_MU}"
-        f"_stag={params.STAGGLERS_FRACTION}"
+        f"_stag={params.STRAGGLERS_FRACTION}"
     )
 
     np.save(
