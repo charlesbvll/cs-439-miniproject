@@ -12,12 +12,13 @@ def centralized_loaders(batch_size, val_ratio, seed):
 
     len_val = int(len(trainset) / (1 / val_ratio))
     lengths = [len(trainset) - len_val, len_val]
+    print(lengths)
     ds_train, ds_val = random_split(
         trainset, lengths, torch.Generator().manual_seed(seed)
     )
 
     return (
-        DataLoader(ds_train, batch_size=batch_size),
+        DataLoader(ds_train, batch_size=batch_size, shuffle=True),
         DataLoader(ds_val, batch_size=batch_size),
         DataLoader(testset, batch_size=batch_size),
     )

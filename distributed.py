@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from pathlib import Path
 
 import flwr as fl
@@ -6,8 +7,9 @@ import numpy as np
 import torch
 
 import src.client as client
-import src.model.optimizer as optimizer
 import src.utils as utils
+from src.model.MNIST_CNN import Net
+from src.strategy import get_strategy
 
 
 @hydra.main(config_path="docs/conf", config_name="base_distributed", version_base=None)
@@ -22,24 +24,32 @@ def main(params) -> None:
         num_rounds=params.NUM_ROUNDS,
         iid=params.IID,
         balance=params.BALANCE,
-        optimizer=optimizer.get(params.OPTIMIZER),
-        learning_rate=params.LR,
+        optim_name=params.client_optim_name,
+        optim_args=params.client_optim_args,
         stagglers=params.STRAGGLERS_FRACTION,
         tqdm_disable=params.TQDM_DISABLE,
     )
 
     evaluate_fn = utils.gen_evaluate_fn(testloader, DEVICE, params.TQDM_DISABLE)
 
-    strategy = fl.server.strategy.FedProx(
+    strategy_class = get_strategy(params.STRATEGY)
+
+    net = Net()
+    initial_params = utils.get_initial_params(net)
+
+    strategy = strategy_class(
         fraction_fit=1.0,
         fraction_evaluate=0.0,
         min_fit_clients=int(params.NUM_CLIENTS * (1 - params.STRAGGLERS_FRACTION)),
         min_evaluate_clients=0,
         min_available_clients=params.NUM_CLIENTS,
+        initial_parameters=initial_params,
         on_fit_config_fn=lambda curr_round: {"curr_round": curr_round},
         evaluate_fn=evaluate_fn,
         evaluate_metrics_aggregation_fn=utils.weighted_average,
         proximal_mu=params.PROXIMAL_MU,
+        optim=params.server_optim_name,
+        **params.server_optim_args,
     )
 
     # Start simulation
@@ -59,9 +69,11 @@ def main(params) -> None:
         f"_R={params.NUM_ROUNDS}"
         f"_mu={params.PROXIMAL_MU}"
         f"_strag={params.STRAGGLERS_FRACTION}"
-        f"_O={params.OPTIMIZER}"
+        f"_CO={params.client_optim_name}"
+        f"_SO={params.server_optim_name}"
     )
 
+    # Save run history
     np.save(
         Path(params.SAVE_PATH) / Path(f"hist{file_suffix}"),
         history,  # type: ignore
@@ -73,6 +85,12 @@ def main(params) -> None:
         f"_centralized{file_suffix}",
         "accuracy",
     )
+
+    # Save the model
+    params_dict = zip(net.state_dict().keys(), strategy.current_weights)
+    state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
+    torch.save(state_dict, Path(params.SAVE_PATH) / Path(f"model{file_suffix}"))
+    net.load_state_dict(state_dict, strict=True)
 
 
 if __name__ == "__main__":

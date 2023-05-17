@@ -1,0 +1,214 @@
+from typing import Callable, Dict, List, Optional, Tuple, Union
+
+import numpy as np
+from flwr.common import (
+    FitIns,
+    FitRes,
+    MetricsAggregationFn,
+    NDArrays,
+    Parameters,
+    Scalar,
+    ndarrays_to_parameters,
+    parameters_to_ndarrays,
+)
+from flwr.server.client_manager import ClientManager
+from flwr.server.client_proxy import ClientProxy
+from flwr.server.strategy.krum import Krum
+
+
+class FedKrumProxOpt(Krum):
+    def __init__(
+        self,
+        *,
+        fraction_fit: float = 1.0,
+        fraction_evaluate: float = 1.0,
+        min_fit_clients: int = 2,
+        min_evaluate_clients: int = 2,
+        min_available_clients: int = 2,
+        num_malicious_clients: int = 0,
+        num_clients_to_keep: int = 0,
+        evaluate_fn: Optional[
+            Callable[
+                [int, NDArrays, Dict[str, Scalar]],
+                Optional[Tuple[float, Dict[str, Scalar]]],
+            ]
+        ] = None,
+        on_fit_config_fn: Optional[Callable[[int], Dict[str, Scalar]]] = None,
+        on_evaluate_config_fn: Optional[Callable[[int], Dict[str, Scalar]]] = None,
+        accept_failures: bool = True,
+        initial_parameters: Parameters,
+        fit_metrics_aggregation_fn: Optional[MetricsAggregationFn] = None,
+        evaluate_metrics_aggregation_fn: Optional[MetricsAggregationFn] = None,
+        optim: str = "sgd",
+        eta: float = 1e-2,
+        eta_l: float = 0.0316,
+        beta_1: float = 0.9,
+        beta_2: float = 0.99,
+        tau: float = 1e-3,
+        proximal_mu: float,
+    ) -> None:
+        """Federated learning strategy using FedMedian for aggregation
+        and Adam, Adagrad, or Yogi for optimization along side FedProx.
+
+        Parameters
+        ----------
+        fraction_fit : float, optional
+            Fraction of clients used during training. Defaults to 1.0.
+        fraction_evaluate : float, optional
+            Fraction of clients used during validation. Defaults to 1.0.
+        min_fit_clients : int, optional
+            Minimum number of clients used during training. Defaults to 2.
+        min_evaluate_clients : int, optional
+            Minimum number of clients used during validation. Defaults to 2.
+        min_available_clients : int, optional
+            Minimum number of total clients in the system. Defaults to 2.
+        num_malicious_clients : int, optional
+            Number of malicious clients in the system. Defaults to 0.
+        num_clients_to_keep : int, optional
+            Number of clients to keep before averaging (MultiKrum). Defaults to 0, in that case classical Krum is applied.
+        evaluate_fn : Optional[Callable[[int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]]]
+            Optional function used for validation. Defaults to None.
+        on_fit_config_fn : Callable[[int], Dict[str, Scalar]], optional
+            Function used to configure training. Defaults to None.
+        on_evaluate_config_fn : Callable[[int], Dict[str, Scalar]], optional
+            Function used to configure validation. Defaults to None.
+        accept_failures : bool, optional
+            Whether or not accept rounds containing failures. Defaults to True.
+        initial_parameters : Parameters
+            Initial global model parameters.
+        fit_metrics_aggregation_fn : Optional[MetricsAggregationFn]
+            Metrics aggregation function, optional.
+        evaluate_metrics_aggregation_fn: Optional[MetricsAggregationFn]
+            Metrics aggregation function, optional.
+        optim: str, optional
+            Which optimizer to use, this can be either "sgd", "adam", "adagrad", or "yogi". Defaults to "sgd".
+        eta : float, optional
+            Server-side learning rate. Defaults to 1e-1.
+        eta_l : float, optional
+            Client-side learning rate. Defaults to 1e-1.
+        beta_1 : float, optional
+            Momentum parameter. Defaults to 0.9.
+        beta_2 : float, optional
+            Second moment parameter. Defaults to 0.99.
+        tau : float, optional
+            Controls the algorithm's degree of adaptability.
+            Defaults to 1e-9.
+        proximal_mu : float
+            The weight of the proximal term used in the optimization. 0.0 makes
+            this strategy equivalent to FedAvg, and the higher the coefficient, the more
+            regularization will be used (that is, the client parameters will need to be
+            closer to the server parameters during training).
+        """
+        super().__init__(
+            fraction_fit=fraction_fit,
+            fraction_evaluate=fraction_evaluate,
+            min_fit_clients=min_fit_clients,
+            min_evaluate_clients=min_evaluate_clients,
+            min_available_clients=min_available_clients,
+            evaluate_fn=evaluate_fn,
+            on_fit_config_fn=on_fit_config_fn,
+            on_evaluate_config_fn=on_evaluate_config_fn,
+            accept_failures=accept_failures,
+            initial_parameters=initial_parameters,
+            fit_metrics_aggregation_fn=fit_metrics_aggregation_fn,
+            evaluate_metrics_aggregation_fn=evaluate_metrics_aggregation_fn,
+            num_malicious_clients=num_malicious_clients,
+            num_clients_to_keep=num_clients_to_keep,
+        )
+        self.current_weights = parameters_to_ndarrays(initial_parameters)
+        self.eta = eta
+        self.eta_l = eta_l
+        self.tau = tau
+        self.beta_1 = beta_1
+        self.beta_2 = beta_2
+        self.m_t: Optional[NDArrays] = None
+        self.v_t: Optional[NDArrays] = None
+        self.optim = optim
+        self.proximal_mu = proximal_mu
+
+    def __repr__(self) -> str:
+        rep = f"FedKrumProxOpt(accept_failures={self.accept_failures})"
+        return rep
+
+    def configure_fit(
+        self, server_round: int, parameters: Parameters, client_manager: ClientManager
+    ) -> List[Tuple[ClientProxy, FitIns]]:
+        """Configure the next round of training.
+
+        Sends the proximal factor mu to the clients
+        """
+        # Get the standard client/config pairs from the FedAvg super-class
+        client_config_pairs = super().configure_fit(
+            server_round, parameters, client_manager
+        )
+
+        # Return client/config pairs with the proximal factor mu added
+        return [
+            (
+                client,
+                FitIns(
+                    fit_ins.parameters,
+                    {**fit_ins.config, "proximal_mu": self.proximal_mu},
+                ),
+            )
+            for client, fit_ins in client_config_pairs
+        ]
+
+    def aggregate_fit(
+        self,
+        server_round: int,
+        results: List[Tuple[ClientProxy, FitRes]],
+        failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
+    ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
+        """Aggregate fit results using weighted average."""
+        fedavg_parameters_aggregated, metrics_aggregated = super().aggregate_fit(
+            server_round=server_round, results=results, failures=failures
+        )
+        if fedavg_parameters_aggregated is None:
+            return None, {}
+
+        fedavg_weights_aggregate = parameters_to_ndarrays(fedavg_parameters_aggregated)
+
+        if self.optim == "sgd":
+            self.current_weights = fedavg_weights_aggregate
+            return fedavg_parameters_aggregated, metrics_aggregated
+
+        delta_t: NDArrays = [
+            x - y for x, y in zip(fedavg_weights_aggregate, self.current_weights)
+        ]
+
+        # m_t
+        if not self.m_t:
+            self.m_t = [np.zeros_like(x) for x in delta_t]
+        self.m_t = [
+            np.multiply(self.beta_1, x) + (1 - self.beta_1) * y
+            for x, y in zip(self.m_t, delta_t)
+        ]
+
+        # v_t
+        if not self.v_t:
+            self.v_t = [np.zeros_like(x) for x in delta_t]
+        if self.optim == "yogi":
+            self.v_t = [
+                x
+                - (1.0 - self.beta_2)
+                * np.multiply(y, y)
+                * np.sign(x - np.multiply(y, y))
+                for x, y in zip(self.v_t, delta_t)
+            ]
+        elif self.optim == "adam":
+            self.v_t = [
+                self.beta_2 * x + (1 - self.beta_2) * np.multiply(y, y)
+                for x, y in zip(self.v_t, delta_t)
+            ]
+        else:
+            self.v_t = [x + np.multiply(y, y) for x, y in zip(self.v_t, delta_t)]
+
+        new_weights = [
+            x + self.eta * y / (np.sqrt(z) + self.tau)
+            for x, y, z in zip(self.current_weights, self.m_t, self.v_t)
+        ]
+
+        self.current_weights = new_weights
+
+        return ndarrays_to_parameters(self.current_weights), metrics_aggregated

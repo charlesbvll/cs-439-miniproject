@@ -8,13 +8,11 @@ from typing import Callable, Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from flwr.common import Metrics
-from flwr.common.typing import NDArrays, Scalar
-from flwr.server.history import History
+from flwr.common import Metrics, NDArrays, Parameters, Scalar, ndarrays_to_parameters
 from torch.utils.data import DataLoader
 
-from src.model.MNIST_CNN import Net
 from src.model.common import test
+from src.model.MNIST_CNN import Net
 
 
 def plot_metric_from_dict(
@@ -27,8 +25,6 @@ def plot_metric_from_dict(
 
     Parameters
     ----------
-    hist : History
-        Object containing evaluation for all rounds.
     save_plot_path : Path
         Folder to save the plot to.
     suffix: Optional[str]
@@ -43,6 +39,7 @@ def plot_metric_from_dict(
 
     plt.savefig(Path(save_plot_path) / Path(f"{metric}{suffix}.png"))
     plt.close()
+
 
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     """Aggregation function for weighted average during evaluation.
@@ -66,7 +63,7 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 
 
 def gen_evaluate_fn(
-        testloader: DataLoader, device: torch.device, tqdm_disable: bool
+    testloader: DataLoader, device: torch.device, tqdm_disable: bool
 ) -> Callable[
     [int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]
 ]:
@@ -102,3 +99,9 @@ def gen_evaluate_fn(
         return loss, {"accuracy": accuracy}
 
     return evaluate
+
+
+def get_initial_params(net: torch.nn.Module) -> Parameters:
+    return ndarrays_to_parameters(
+        [val.cpu().numpy() for _, val in net.state_dict().items()]
+    )

@@ -3,6 +3,8 @@ TQDM_DISABLE: True
 
 DEVICE: "cpu"
 
+STRATEGY: "fedavg"
+
 NUM_ROUNDS: 1
 NUM_EPOCHS: 5
 
@@ -10,9 +12,16 @@ BATCH_SIZE: 32
 VAL_RATIO: 0.2
 SEED: 42
 
-LR: 0.1
 PROXIMAL_MU: 0.0
-OPTIMIZER: "sgd"
+client_optim_name: "sgd"
+client_optim_args:
+  lr: 0.1
+server_optim_name: "sgd"
+server_optim_args:
+  eta: 1e-2
+  beta_1: 0.9
+  beta_2: 0.99
+  tau: 1e-3
 
 NUM_CLIENTS: 10
 IID: False

@@ -8,14 +8,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from optimizer import Optimizer
 
-def train(  # pylint: disable=too-many-arguments
+def train(
     net: nn.Module,
     trainloader: DataLoader,
-    optimizer: torch.optim,
+    optimizer: Optimizer,
     device: torch.device,
     epochs: int,
-    learning_rate: float,
     proximal_mu: float,
     tqdm_disable: bool,
 ) -> None:
@@ -37,22 +37,28 @@ def train(  # pylint: disable=too-many-arguments
         Parameter for the weight of the proximal term.
     """
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = optimizer(net.parameters(), lr=learning_rate)
     global_params = [val.detach().clone() for val in net.parameters()]
     net.train()
     for _ in tqdm(range(epochs), disable=tqdm_disable):
         net = _training_loop(
-            net, global_params, trainloader, device, criterion, optimizer, proximal_mu, tqdm_disable
+            net,
+            global_params,
+            trainloader,
+            device,
+            criterion,
+            optimizer,
+            proximal_mu,
+            tqdm_disable,
         )
 
 
-def _training_loop(  # pylint: disable=too-many-arguments
+def _training_loop(
     net: nn.Module,
     global_params: List[torch.Tensor],
     trainloader: DataLoader,
     device: torch.device,
     criterion: torch.nn.CrossEntropyLoss,
-    optimizer: torch.optim,
+    optimizer: Optimizer,
     proximal_mu: float,
     tqdm_disable: bool,
 ) -> nn.Module:
@@ -93,7 +99,7 @@ def _training_loop(  # pylint: disable=too-many-arguments
 
 
 def test(
-        net: nn.Module, testloader: DataLoader, device: torch.device, tqdm_disable: bool
+    net: nn.Module, testloader: DataLoader, device: torch.device, tqdm_disable: bool
 ) -> Tuple[float, float]:
     """Evaluate the network on the entire test set.
 

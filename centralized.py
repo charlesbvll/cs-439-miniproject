@@ -20,6 +20,7 @@ def main(params):
     )
 
     net = Net().to(DEVICE)
+    optim = optimizer.get(params.optim_name, net.parameters(), params.optim_args)
 
     results = {"accuracy": [], "loss": []}
 
@@ -28,17 +29,14 @@ def main(params):
         train(
             net,
             train_loader,
-            optimizer.get(params.OPTIMIZER),
+            optim,
             DEVICE,
             params.NUM_EPOCHS,
-            params.LR,
             params.PROXIMAL_MU,
             params.TQDM_DISABLE,
         )
         loss, accuracy = test(net, val_loader, DEVICE, params.TQDM_DISABLE)
-        print(
-                f"Validation results: loss: {loss:.3f}, accuracy: {accuracy:.3f}"
-        )
+        print(f"Validation results: loss: {loss:.3f}, accuracy: {accuracy:.3f}")
         results["accuracy"].append((round, accuracy))
         results["loss"].append((round, loss))
 
@@ -46,7 +44,7 @@ def main(params):
         f"_B={params.BATCH_SIZE}"
         f"_E={params.NUM_EPOCHS}"
         f"_R={params.NUM_ROUNDS}"
-        f"_O={params.OPTIMIZER}"
+        f"_O={params.optim_name}"
     )
 
     np.save(Path(params.SAVE_PATH) / Path(f"hist{file_suffix}"), results)

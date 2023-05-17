@@ -2,7 +2,7 @@
 
 
 from collections import OrderedDict
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Union
 
 import flwr as fl
 import numpy as np
@@ -10,9 +10,10 @@ import torch
 from flwr.common.typing import NDArrays, Scalar
 from torch.utils.data import DataLoader
 
-from src.dataset.MNIST import distributed_loaders 
+import src.model.optimizer as optimizer
+from src.dataset.MNIST import distributed_loaders
+from src.model.common import test, train
 from src.model.MNIST_CNN import Net
-from src.model.common import train, test
 
 
 class FlowerClient(
@@ -25,12 +26,11 @@ class FlowerClient(
         net: torch.nn.Module,
         trainloader: DataLoader,
         valloader: DataLoader,
-        optimizer: torch.optim,
+        optimizer: optimizer.Optimizer,
         device: torch.device,
         num_epochs: int,
-        learning_rate: float,
         staggler_schedule: np.ndarray,
-        tqdm_disable: bool
+        tqdm_disable: bool,
     ):  # pylint: disable=too-many-arguments
         self.net = net
         self.trainloader = trainloader
@@ -38,7 +38,6 @@ class FlowerClient(
         self.optimizer = optimizer
         self.device = device
         self.num_epochs = num_epochs
-        self.learning_rate = learning_rate
         self.staggler_schedule = staggler_schedule
         self.tqdm_disable = tqdm_disable
 
@@ -74,9 +73,8 @@ class FlowerClient(
             self.optimizer,
             self.device,
             epochs=num_epochs,
-            learning_rate=self.learning_rate,
             proximal_mu=config["proximal_mu"],
-            tqdm_disable=self.tqdm_disable
+            tqdm_disable=self.tqdm_disable,
         )
 
         return self.get_parameters({}), len(self.trainloader), {}
@@ -98,10 +96,10 @@ def gen_client_fn(
     num_rounds: int,
     num_epochs: int,
     batch_size: int,
-    optimizer: torch.optim,
-    learning_rate: float,
+    optim_name: str,
+    optim_args: Dict[str, Union[float, Tuple[float, float]]],
     stagglers: float,
-    tqdm_disable: bool
+    tqdm_disable: bool,
 ) -> Tuple[
     Callable[[str], FlowerClient], DataLoader
 ]:  # pylint: disable=too-many-arguments
@@ -161,17 +159,18 @@ def gen_client_fn(
         trainloader = trainloaders[int(cid)]
         valloader = valloaders[int(cid)]
 
+        optim = optimizer.get(optim_name=optim_name, params=net.parameters(), args=optim_args)
+
         # Create a  single Flower client representing a single organization
         return FlowerClient(
             net,
             trainloader,
             valloader,
-            optimizer,
+            optim,
             device,
             num_epochs,
-            learning_rate,
             stagglers_mat[int(cid)],
-            tqdm_disable
+            tqdm_disable,
         )
 
     return client_fn, testloader
