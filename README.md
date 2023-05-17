@@ -1,5 +1,8 @@
 # Exploring optimization and regularization methods in Federated Learning
-Project for the CS-439 course (Optimization for Machine Learning).
+
+Project for the CS-439 course (Optimization for Machine Learning). Check-out the description [here](docs/miniproject_description.pdf).
+
+[Here](https://www.overleaf.com/project/6415ca8ec4888a6faeb0192a) is the final report (WIP).
 
 ## Plan of action
 - [x] Get familiar with [Flower](https://github.com/adap/flower) 
@@ -32,9 +35,64 @@ Project for the CS-439 course (Optimization for Machine Learning).
 
 - [x] Make optimizer modular
 
-- [ ] Write custom optimizer
+- [ ] Create custom optimizers
 
+    - [ ] SGD
+        
+    - [ ] Adam 
+        
+    - [ ] RMSProp
+    
+ - [ ] Add different strategies
+
+    - [ ] FedMedian
+
+    - [ ] FedKrum
+    
 - [ ] Play around with different methods
+
+  - [ ] FedAvg 
+
+    - [ ] SGD
+    
+    - [ ] SGD+FedProx
+    
+    - [ ] Adam 
+    
+    - [ ] Adam+FedProx
+    
+    - [ ] RMSProp
+    
+    - [ ] RMSProp+FedProx
+    
+  - [ ] FedMedian 
+
+    - [ ] SGD
+    
+    - [ ] SGD+FedProx
+    
+    - [ ] Adam 
+    
+    - [ ] Adam+FedProx
+    
+    - [ ] RMSProp
+    
+    - [ ] RMSProp+FedProx
+  
+  - [ ] FedKrum 
+
+    - [ ] SGD
+    
+    - [ ] SGD+FedProx
+    
+    - [ ] Adam 
+    
+    - [ ] Adam+FedProx
+    
+    - [ ] RMSProp
+    
+    - [ ] RMSProp+FedProx
+
 
 ## Install
 
