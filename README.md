@@ -43,9 +43,9 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
     
  - [ ] Add different strategies
 
-  - [ ] FedMedian
+    - [ ] FedMedian
 
-  - [ ] FedKrum
+    - [ ] FedKrum
     
 - [ ] Play around with different methods
 
