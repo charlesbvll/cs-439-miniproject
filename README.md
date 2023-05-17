@@ -2,6 +2,8 @@
 
 Project for the CS-439 course (Optimization for Machine Learning). Check-out the description [here](docs/miniproject_description.pdf).
 
+[Here](https://www.overleaf.com/project/6415ca8ec4888a6faeb0192a) is the final report (WIP).
+
 ## Plan of action
 - [x] Get familiar with [Flower](https://github.com/adap/flower) 
 
