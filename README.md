@@ -33,6 +33,20 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
 
 - [x] Make optimizer modular
 
+- [ ] Create custom optimizers
+
+    - [ ] SGD
+        
+    - [ ] Adam 
+        
+    - [ ] RMSProp
+    
+ - [ ] Add different strategies
+
+  - [ ] FedMedian
+
+  - [ ] FedKrum
+    
 - [ ] Play around with different methods
 
   - [ ] FedAvg 
