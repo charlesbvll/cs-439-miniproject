@@ -33,32 +33,50 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
 
 - [x] Make optimizer modular
 
-- [ ] Write custom optimizer
-
 - [ ] Play around with different methods
 
-## Methods
+  - [ ] FedAvg 
 
-| Aggregation strategies | Optimizers      |
-|------------------------|-----------------|
-| FedAvg                 | SGD             |
-| FedAvg                 | SGD+FedProx     |
-| FedAvg                 | Adam            |
-| FedAvg                 | Adam+FedProx    |
-| FedAvg                 | RMSProp         |
-| FedAvg                 | RMSProp+FedProx |
-| FedMedian              | SGD             |
-| FedMedian              | SGD+FedProx     |
-| FedMedian              | Adam            |
-| FedMedian              | Adam+FedProx    |
-| FedMedian              | RMSProp         |
-| FedMedian              | RMSProp+FedProx |
-| FedKrum                | SGD             |
-| FedKrum                | SGD+FedProx     |
-| FedKrum                | Adam            |
-| FedKrum                | Adam+FedProx    |
-| FedKrum                | RMSProp         |
-| FedKrum                | RMSProp+FedProx |
+    - [ ] SGD
+    
+    - [ ] SGD+FedProx
+    
+    - [ ] Adam 
+    
+    - [ ] Adam+FedProx
+    
+    - [ ] RMSProp
+    
+    - [ ] RMSProp+FedProx
+    
+  - [ ] FedMedian 
+
+    - [ ] SGD
+    
+    - [ ] SGD+FedProx
+    
+    - [ ] Adam 
+    
+    - [ ] Adam+FedProx
+    
+    - [ ] RMSProp
+    
+    - [ ] RMSProp+FedProx
+  
+  - [ ] FedKrum 
+
+    - [ ] SGD
+    
+    - [ ] SGD+FedProx
+    
+    - [ ] Adam 
+    
+    - [ ] Adam+FedProx
+    
+    - [ ] RMSProp
+    
+    - [ ] RMSProp+FedProx
+
 
 ## Install
 
