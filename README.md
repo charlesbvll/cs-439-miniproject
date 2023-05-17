@@ -37,6 +37,29 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
 
 - [ ] Play around with different methods
 
+## Methods
+
+| Aggregation strategies | Optimizers      |
+|------------------------|-----------------|
+| FedAvg                 | SGD             |
+| FedAvg                 | SGD+FedProx     |
+| FedAvg                 | Adam            |
+| FedAvg                 | Adam+FedProx    |
+| FedAvg                 | RMSProp         |
+| FedAvg                 | RMSProp+FedProx |
+| FedMedian              | SGD             |
+| FedMedian              | SGD+FedProx     |
+| FedMedian              | Adam            |
+| FedMedian              | Adam+FedProx    |
+| FedMedian              | RMSProp         |
+| FedMedian              | RMSProp+FedProx |
+| FedKrum                | SGD             |
+| FedKrum                | SGD+FedProx     |
+| FedKrum                | Adam            |
+| FedKrum                | Adam+FedProx    |
+| FedKrum                | RMSProp         |
+| FedKrum                | RMSProp+FedProx |
+
 ## Install
 
 `Poetry` is recommended for installing the dependencies: `poetry install`.
