@@ -12,7 +12,6 @@ def centralized_loaders(batch_size, val_ratio, seed):
 
     len_val = int(len(trainset) / (1 / val_ratio))
     lengths = [len(trainset) - len_val, len_val]
-    print(lengths)
     ds_train, ds_val = random_split(
         trainset, lengths, torch.Generator().manual_seed(seed)
     )

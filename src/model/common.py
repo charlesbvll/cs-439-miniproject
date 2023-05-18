@@ -1,14 +1,14 @@
 """CNN model architecutre, training, and testing functions for MNIST."""
 
 
-from typing import List, Tuple
+from typing import Tuple
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from optimizer import Optimizer
+from .optimizer import Optimizer
 
 def train(
     net: nn.Module,
@@ -39,64 +39,21 @@ def train(
     criterion = torch.nn.CrossEntropyLoss()
     global_params = [val.detach().clone() for val in net.parameters()]
     net.train()
-    for _ in tqdm(range(epochs), disable=tqdm_disable):
-        net = _training_loop(
-            net,
-            global_params,
-            trainloader,
-            device,
-            criterion,
-            optimizer,
-            proximal_mu,
-            tqdm_disable,
-        )
-
-
-def _training_loop(
-    net: nn.Module,
-    global_params: List[torch.Tensor],
-    trainloader: DataLoader,
-    device: torch.device,
-    criterion: torch.nn.CrossEntropyLoss,
-    optimizer: Optimizer,
-    proximal_mu: float,
-    tqdm_disable: bool,
-) -> nn.Module:
-    """Train for one epoch.
-
-    Parameters
-    ----------
-    net : nn.Module
-        The neural network to train.
-    global_params : List[Parameter]
-        The parameters of the global model (from the server).
-    trainloader : DataLoader
-        The DataLoader containing the data to train the network on.
-    device : torch.device
-        The device on which the model should be trained, either 'cpu' or 'cuda'.
-    criterion : torch.nn.CrossEntropyLoss
-        The loss function to use for training
-    optimizer : torch.optim.Adam
-        The optimizer to use for training
-    proximal_mu : float
-        Parameter for the weight of the proximal term.
-
-    Returns
-    -------
-    nn.Module
-        The model that has been trained for one epoch.
-    """
-    for images, labels in tqdm(trainloader, disable=tqdm_disable, leave=False):
-        images, labels = images.to(device), labels.to(device)
-        optimizer.zero_grad()
-        proximal_term = 0.0
-        for local_weights, global_weights in zip(net.parameters(), global_params):
-            proximal_term += (local_weights - global_weights).norm(2)
-        loss = criterion(net(images), labels) + (proximal_mu / 2) * proximal_term
-        loss.backward()
-        optimizer.step()
-    return net
-
+    for epoch in tqdm(range(epochs), disable=tqdm_disable):
+        running_loss = 0.0
+        for batch_number, (images, labels) in tqdm(enumerate(trainloader), disable=tqdm_disable, leave=False):
+            images, labels = images.to(device), labels.to(device)
+            optimizer.zero_grad()
+            proximal_term = 0.0
+            for local_weights, global_weights in zip(net.parameters(), global_params):
+                proximal_term += (local_weights - global_weights).norm(2)
+            loss = criterion(net(images), labels) + (proximal_mu / 2) * proximal_term
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+            if batch_number % 1000 == 999:    # print every 2000 mini-batches
+                print(f'[{epoch + 1}, {batch_number + 1:5d}] loss: {running_loss / 1000:.3f}')
+                running_loss = 0.0
 
 def test(
     net: nn.Module, testloader: DataLoader, device: torch.device, tqdm_disable: bool
@@ -128,8 +85,6 @@ def test(
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-    if len(testloader.dataset) == 0:
-        raise ValueError("Testloader can't be 0, exiting...")
-    loss /= len(testloader.dataset)
-    accuracy = correct / total
+    loss /= total
+    accuracy = float(correct / total)
     return loss, accuracy
