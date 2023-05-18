@@ -2,7 +2,9 @@ from typing import Dict, Iterable, Tuple, Union
 
 import torch
 
-Optimizer = Union[torch.optim.SGD, torch.optim.Adam, torch.optim.RMSprop]
+from .yogi import Yogi
+
+Optimizer = Union[torch.optim.SGD, torch.optim.Adam, torch.optim.RMSprop, Yogi]
 
 
 def get(
