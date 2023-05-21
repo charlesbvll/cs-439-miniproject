@@ -51,7 +51,7 @@ def train(
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-            if batch_number % 1000 == 999:    # print every 2000 mini-batches
+            if batch_number % 1000 == 999:    # print every 1000 mini-batches
                 print(f'[{epoch + 1}, {batch_number + 1:5d}] loss: {running_loss / 1000:.3f}')
                 running_loss = 0.0
 
