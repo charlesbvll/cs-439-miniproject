@@ -1,6 +1,8 @@
 .dataset
 poetry.lock
 outputs
+multirun/
+docs/results
 **/*.png
 **/*.npy
 

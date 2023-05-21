@@ -35,64 +35,68 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
 
 - [x] Make optimizer modular
 
-- [ ] Create custom optimizers
+- [x] Create custom client optimizers
 
-    - [ ] SGD
+    - [x] SGD
         
-    - [ ] Adam 
+    - [x] Adam 
         
-    - [ ] RMSProp
+    - [x] RMSProp
     
- - [ ] Add different strategies
+ - [x] Add different strategies
 
-    - [ ] FedMedian
+    - [x] FedMedian
 
-    - [ ] FedKrum
+    - [x] FedKrum
+
+- [x] Add server side optimizers
+
+    - [x] Adagrad
+
+    - [x] Adam
+
+    - [x] Yogi
     
 - [ ] Play around with different methods
 
-  - [ ] FedAvg 
+  - [ ] SGD 
 
-    - [ ] SGD
+    ```sh
+    python distributed.py -m STRATEGY=fedavg,fedmedian,fedkrum \
+                             client_optim_name=sgd \
+                             client_optim_args.lr=0.01 \
+                             server_optim_name=sgd,adagrad,yogi,adam \
+                             PROXIMAL_MU=0.0,1.0 \
+                             NUM_ROUNDS=200 \
+                             NUM_CLIENTS=10 \
+                             STRAGGLERS_FRACTION=0.0,0.6 
+    ```
     
-    - [ ] SGD+FedProx
-    
-    - [ ] Adam 
-    
-    - [ ] Adam+FedProx
-    
-    - [ ] RMSProp
-    
-    - [ ] RMSProp+FedProx
-    
-  - [ ] FedMedian 
+  - [ ] Adam 
 
-    - [ ] SGD
-    
-    - [ ] SGD+FedProx
-    
-    - [ ] Adam 
-    
-    - [ ] Adam+FedProx
-    
-    - [ ] RMSProp
-    
-    - [ ] RMSProp+FedProx
+    ```sh
+    python distributed.py -m STRATEGY=fedavg,fedmedian,fedkrum \
+                             client_optim_name=adam \
+                             client_optim_args.lr=0.001 \
+                             server_optim_name=sgd,adagrad,yogi,adam \
+                             PROXIMAL_MU=0.0,1.0 \
+                             NUM_ROUNDS=200 \
+                             NUM_CLIENTS=10 \
+                             STRAGGLERS_FRACTION=0.0,0.6 
+    ```
   
-  - [ ] FedKrum 
+  - [ ] RMSprop
 
-    - [ ] SGD
-    
-    - [ ] SGD+FedProx
-    
-    - [ ] Adam 
-    
-    - [ ] Adam+FedProx
-    
-    - [ ] RMSProp
-    
-    - [ ] RMSProp+FedProx
-
+    ```sh
+    python distributed.py -m STRATEGY=fedavg,fedmedian,fedkrum \
+                             client_optim_name=rmsprop \
+                             client_optim_args.lr=0.01 \
+                             server_optim_name=sgd,adagrad,yogi,adam \
+                             PROXIMAL_MU=0.0,1.0 \
+                             NUM_ROUNDS=200 \
+                             NUM_CLIENTS=10 \
+                             STRAGGLERS_FRACTION=0.0,0.6 
+    ```
 
 ## Install
 
