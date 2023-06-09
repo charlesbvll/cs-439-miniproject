@@ -119,12 +119,6 @@ To run the MNIST digit recognition task in a centralized setting, the following 
 python centralized.py
 ```
 
-### Example result
-
-With `batch_size=32`, `num_epochs=5`, `num_rounds=1`, and `optimizer=sgd` the following plot is obtained:
-
-![Centralized example plot](docs/results/centralized/accuracy_B=32_E=5_R=2_O=sgd.png)
-
 ## Distributed setting
 
 To run MNIST digit recognition task in a distributed setting, the following command can be used:
@@ -132,12 +126,6 @@ To run MNIST digit recognition task in a distributed setting, the following comm
 ```sh
 python distributed.py
 ```
-
-### Example result
-
-With `batch_size=32`, `num_epochs=5`, `num_rounds=1`, and `optimizer=sgd` the following plot is obtained:
-
-![Distributed example plot](docs/results/distributed/accuracy_centralized_balanced_C=10_B=32_E=5_R=2_mu=0.0_strag=0.0_O=sgd.png)
 
 ## Changing parameters
 
