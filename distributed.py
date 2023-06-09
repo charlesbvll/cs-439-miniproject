@@ -71,6 +71,7 @@ def main(params) -> None:
         f"_strag={params.STRAGGLERS_FRACTION}"
         f"_CO={params.client_optim_name}"
         f"_SO={params.server_optim_name}"
+        f"_strat={params.STRATEGY}"
     )
 
     # Save run history

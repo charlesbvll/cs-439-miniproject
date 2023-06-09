@@ -2,7 +2,7 @@
 
 
 from collections import OrderedDict
-from typing import Callable, Dict, Tuple, Union
+from typing import Any, Callable, Dict, Tuple, Union
 
 import flwr as fl
 import numpy as np
@@ -26,7 +26,8 @@ class FlowerClient(
         net: torch.nn.Module,
         trainloader: DataLoader,
         valloader: DataLoader,
-        optimizer: optimizer.Optimizer,
+        optim_name: str,
+        optim_args: Dict[str, Any],
         device: torch.device,
         num_epochs: int,
         staggler_schedule: np.ndarray,
@@ -35,7 +36,8 @@ class FlowerClient(
         self.net = net
         self.trainloader = trainloader
         self.valloader = valloader
-        self.optimizer = optimizer
+        self.optim_name = optim_name
+        self.optim_args = optim_args
         self.device = device
         self.num_epochs = num_epochs
         self.staggler_schedule = staggler_schedule
@@ -70,7 +72,8 @@ class FlowerClient(
         train(
             self.net,
             self.trainloader,
-            self.optimizer,
+            self.optim_name,
+            self.optim_args,
             self.device,
             epochs=num_epochs,
             proximal_mu=config["proximal_mu"],
@@ -126,8 +129,6 @@ def gen_client_fn(
         The size of the local batches each client trains on.
     learning_rate : float
         The learning rate for the SGD  optimizer of clients.
-    stagglers : float
-        Proportion of stagglers in the clients, between 0 and 1.
 
     Returns
     -------
@@ -159,14 +160,13 @@ def gen_client_fn(
         trainloader = trainloaders[int(cid)]
         valloader = valloaders[int(cid)]
 
-        optim = optimizer.get(optim_name=optim_name, params=net.parameters(), args=optim_args)
-
         # Create a  single Flower client representing a single organization
         return FlowerClient(
             net,
             trainloader,
             valloader,
-            optim,
+            optim_name,
+            optim_args,
             device,
             num_epochs,
             stagglers_mat[int(cid)],

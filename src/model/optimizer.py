@@ -7,7 +7,7 @@ from .yogi import Yogi
 Optimizer = Union[torch.optim.SGD, torch.optim.Adam, torch.optim.RMSprop, Yogi]
 
 
-def get(
+def get_optim(
     optim_name: str,
     params: Iterable,
     args: Dict[str, Union[float, Tuple[float, float]]],

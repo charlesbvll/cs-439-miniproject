@@ -1,19 +1,20 @@
 """CNN model architecutre, training, and testing functions for MNIST."""
 
 
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from .optimizer import Optimizer
+from .optimizer import get_optim
 
 def train(
     net: nn.Module,
     trainloader: DataLoader,
-    optimizer: Optimizer,
+    optim_name: str,
+    optim_args: Dict[str, Any],
     device: torch.device,
     epochs: int,
     proximal_mu: float,
@@ -31,13 +32,10 @@ def train(
         The device on which the model should be trained, either 'cpu' or 'cuda'.
     epochs : int
         The number of epochs the model should be trained for.
-    learning_rate : float
-        The learning rate for the SGD optimizer.
-    proximal_mu : float
-        Parameter for the weight of the proximal term.
     """
     criterion = torch.nn.CrossEntropyLoss()
     global_params = [val.detach().clone() for val in net.parameters()]
+    optimizer = get_optim(optim_name, net.parameters(), optim_args)
     net.train()
     for epoch in tqdm(range(epochs), disable=tqdm_disable):
         running_loss = 0.0

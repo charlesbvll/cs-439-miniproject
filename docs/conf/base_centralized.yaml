@@ -1,7 +1,7 @@
 ---
 TQDM_DISABLE: False
 
-DEVICE: "cuda"
+DEVICE: "cpu"
 
 NUM_ROUNDS: 1
 NUM_EPOCHS: 5

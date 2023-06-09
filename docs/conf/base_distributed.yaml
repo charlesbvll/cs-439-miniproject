@@ -15,7 +15,7 @@ SEED: 42
 PROXIMAL_MU: 0.0
 client_optim_name: "sgd"
 client_optim_args:
-  lr: 0.1
+  lr: 0.01
 server_optim_name: "sgd"
 server_optim_args:
   eta: 1e-2
@@ -25,7 +25,7 @@ server_optim_args:
 
 NUM_CLIENTS: 10
 IID: False
-BALANCE: True
+BALANCE: False
 STRAGGLERS_FRACTION: 0.0
 
 SAVE_PATH: "docs/results/distributed"
