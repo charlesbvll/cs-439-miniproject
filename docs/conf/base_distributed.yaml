@@ -25,7 +25,6 @@ server_optim_args:
 
 NUM_CLIENTS: 10
 IID: False
-BALANCE: False
 STRAGGLERS_FRACTION: 0.0
 
 SAVE_PATH: "docs/results/distributed"

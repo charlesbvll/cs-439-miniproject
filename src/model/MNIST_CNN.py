@@ -25,7 +25,7 @@ class Net(nn.Module):
 
         Parameters
         ----------
-        x : torch.Tensor
+        input_tensor : torch.Tensor
             Input Tensor that will pass through the network
 
         Returns

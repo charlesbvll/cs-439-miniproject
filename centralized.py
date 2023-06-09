@@ -4,7 +4,6 @@ import hydra
 import numpy as np
 import torch
 
-import src.model.optimizer as optimizer
 from src.dataset.MNIST import centralized_loaders
 from src.model.common import test, train
 from src.model.MNIST_CNN import Net
@@ -20,7 +19,6 @@ def main(params):
     )
 
     net = Net().to(DEVICE)
-    optim = optimizer.get(params.optim_name, net.parameters(), params.optim_args)
 
     results = {"accuracy": [], "loss": []}
 
@@ -29,7 +27,8 @@ def main(params):
         train(
             net,
             train_loader,
-            optim,
+            params.optim_name,
+            params.optim_args,
             DEVICE,
             params.NUM_EPOCHS,
             params.PROXIMAL_MU,
