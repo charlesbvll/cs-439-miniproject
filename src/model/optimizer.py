@@ -12,7 +12,8 @@ def get_optim(
     params: Iterable,
     args: Dict[str, Union[float, Tuple[float, float]]],
 ) -> Optimizer:
-    if optim_name == "sgd":
+    """Return a given optimizers with the given arguments."""
+    if optim_name == "adam":
         return torch.optim.Adam(
             params=params, **args
         )

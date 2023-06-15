@@ -1,6 +1,3 @@
-"""Defines the MNIST Flower Client and a function to instantiate it."""
-
-
 from collections import OrderedDict
 from typing import Any, Callable, Dict, Tuple, Union
 
@@ -10,7 +7,6 @@ import torch
 from flwr.common.typing import NDArrays, Scalar
 from torch.utils.data import DataLoader
 
-import src.model.optimizer as optimizer
 from src.dataset.MNIST import distributed_loaders
 from src.model.common import test, train
 from src.model.MNIST_CNN import Net
@@ -94,14 +90,13 @@ class FlowerClient(
 def gen_client_fn(
     device: torch.device,
     iid: bool,
-    balance: bool,
     num_clients: int,
     num_rounds: int,
     num_epochs: int,
     batch_size: int,
     optim_name: str,
     optim_args: Dict[str, Union[float, Tuple[float, float]]],
-    stagglers: float,
+    stragglers: float,
     tqdm_disable: bool,
 ) -> Tuple[
     Callable[[str], FlowerClient], DataLoader
@@ -117,18 +112,23 @@ def gen_client_fn(
         should be independent and identically distributed between the clients
         or if the data should first be sorted by labels and distributed by chunks
         to each client (used to test the convergence in a worst case scenario)
-    balance : bool
-        Whether the dataset should contain an equal number of samples in each class,
-        by default True
     num_clients : int
         The number of clients present in the setup
+    num_rounds : int
+        The number of communication rounds the server will perform.
     num_epochs : int
         The number of local epochs each client should run the training for before
         sending it to the server.
     batch_size : int
         The size of the local batches each client trains on.
-    learning_rate : float
-        The learning rate for the SGD  optimizer of clients.
+    optim_name : str
+        The name of the client optimizer to use (either 'sgd', 'adam', or 'rmsprop').
+    optim_args : Dict[str, Union[float, Tuple[float, float]]]
+        A dicitonnary containing arguments for the optimizer (can be empty).
+    stragglers : float
+        The fraction of machines that should be considered as stragglers.
+    tqdm_disable : bool
+        Used to disable the tqdm progress bar while training.
 
     Returns
     -------
@@ -137,15 +137,15 @@ def gen_client_fn(
         the DataLoader that will be used for testing
     """
     trainloaders, valloaders, testloader = distributed_loaders(
-        iid=iid, balance=balance, num_clients=num_clients, batch_size=batch_size
+        iid=iid, num_clients=num_clients, batch_size=batch_size
     )
 
-    # Defines a staggling schedule for each clients, i.e at which round will they
-    # be a staggler. This is done so at each round the proportion of staggling
+    # Defines a straggling schedule for each clients, i.e at which round will they
+    # be a straggler. This is done so at each round the proportion of straggling
     # clients is respected
-    stagglers_mat = np.transpose(
+    stragglers_mat = np.transpose(
         np.random.choice(
-            [0, 1], size=(num_rounds, num_clients), p=[1 - stagglers, stagglers]
+            [0, 1], size=(num_rounds, num_clients), p=[1 - stragglers, stragglers]
         )
     )
 
@@ -169,7 +169,7 @@ def gen_client_fn(
             optim_args,
             device,
             num_epochs,
-            stagglers_mat[int(cid)],
+            stragglers_mat[int(cid)],
             tqdm_disable,
         )
 

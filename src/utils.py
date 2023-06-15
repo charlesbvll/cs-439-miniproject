@@ -1,6 +1,3 @@
-"""Contains utility functions for CNN FL on MNIST."""
-
-
 from collections import OrderedDict
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
@@ -27,8 +24,10 @@ def plot_metric_from_dict(
     ----------
     save_plot_path : Path
         Folder to save the plot to.
-    suffix: Optional[str]
+    suffix : Optional[str]
         Optional string to add at the end of the filename for the plot.
+    metric : Optional[str]
+        Metric to plot ('loss' or 'accuracy').
     """
     rounds, values = zip(*dict[metric])
     plt.plot(np.asarray(rounds), np.asarray(values), label="FedProx")
@@ -75,6 +74,8 @@ def gen_evaluate_fn(
         The dataloader to test the model with.
     device : torch.device
         The device to test the model on.
+    tqdm_disable : bool
+        Used to disable the tqdm progress bar while training.
 
     Returns
     -------
@@ -102,6 +103,7 @@ def gen_evaluate_fn(
 
 
 def get_initial_params(net: torch.nn.Module) -> Parameters:
+    """Return parameters of a given model."""
     return ndarrays_to_parameters(
         [val.cpu().numpy() for _, val in net.state_dict().items()]
     )

@@ -5,6 +5,11 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
 [Here](https://www.overleaf.com/project/6415ca8ec4888a6faeb0192a) is the final report (WIP).
 
 ## Plan of action
+
+<details>
+<summary>View steps</summary>
+<p>
+
 - [x] Get familiar with [Flower](https://github.com/adap/flower) 
 
 - [x] Centralized setting
@@ -97,6 +102,8 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
                              NUM_CLIENTS=10 \
                              STRAGGLERS_FRACTION=0.0,0.6 
     ```
+</p>
+</details>
 
 ## Install
 
@@ -112,12 +119,6 @@ To run the MNIST digit recognition task in a centralized setting, the following 
 python centralized.py
 ```
 
-### Example result
-
-With `batch_size=32`, `num_epochs=5`, `num_rounds=1`, and `optimizer=sgd` the following plot is obtained:
-
-![Centralized example plot](docs/results/centralized/accuracy_B=32_E=5_R=2_O=sgd.png)
-
 ## Distributed setting
 
 To run MNIST digit recognition task in a distributed setting, the following command can be used:
@@ -126,13 +127,21 @@ To run MNIST digit recognition task in a distributed setting, the following comm
 python distributed.py
 ```
 
-### Example result
-
-With `batch_size=32`, `num_epochs=5`, `num_rounds=1`, and `optimizer=sgd` the following plot is obtained:
-
-![Distributed example plot](docs/results/distributed/accuracy_centralized_balanced_C=10_B=32_E=5_R=2_mu=0.0_strag=0.0_O=sgd.png)
-
 ## Changing parameters
 
 The `--help` flag can be used to display the different parameters that can be changed.
+
+# Results
+
+Comparing different mu values with FedAvg and SGD as a client side optimizer with 0% stragglers we have:
+
+![0% stragglers FedAvg results](docs/results/centralized_metrics_0.png)
+
+Comparing different mu values with FedAvg and SGD as a client side optimizer with 60% stragglers we have:
+
+![60% stragglers FedAvg results](docs/results/centralized_metrics_06.png)
+
+Comparing different strategies with mu set to 0 and SGD as a client side optimizer with 60% stragglers we have:
+
+![60% stragglers with mu set to 0](docs/results/centralized_metrics_06_fedmed.png)
 

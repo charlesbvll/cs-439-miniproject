@@ -47,7 +47,7 @@ class FedKrumProxOpt(Krum):
         tau: float = 1e-3,
         proximal_mu: float,
     ) -> None:
-        """Federated learning strategy using FedMedian for aggregation
+        """Federated learning strategy using FedKrum for aggregation
         and Adam, Adagrad, or Yogi for optimization along side FedProx.
 
         Parameters

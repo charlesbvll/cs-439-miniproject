@@ -1,6 +1,3 @@
-"""CNN model architecutre, training, and testing functions for MNIST."""
-
-
 from typing import Any, Dict, Tuple
 
 import torch
@@ -28,10 +25,21 @@ def train(
         The neural network to train.
     trainloader : DataLoader
         The DataLoader containing the data to train the network on.
+    optim_name : str
+        The name of the client optimizer to use (either 'sgd', 'adam', or 'rmsprop').
+    optim_args : Dict[str, Union[float, Tuple[float, float]]]
+        A dicitonnary containing arguments for the optimizer (can be empty).
     device : torch.device
         The device on which the model should be trained, either 'cpu' or 'cuda'.
     epochs : int
         The number of epochs the model should be trained for.
+    proximal_mu : float
+        The weight of the proximal term used in the optimization. 0.0 makes
+        this strategy equivalent to FedAvg, and the higher the coefficient, the more
+        regularization will be used (that is, the client parameters will need to be
+        closer to the server parameters during training).
+    tqdm_disable : bool
+        Used to disable the tqdm progress bar while training.
     """
     criterion = torch.nn.CrossEntropyLoss()
     global_params = [val.detach().clone() for val in net.parameters()]
@@ -66,6 +74,8 @@ def test(
         The DataLoader containing the data to test the network on.
     device : torch.device
         The device on which the model should be tested, either 'cpu' or 'cuda'.
+    tqdm_disable : bool
+        Used to disable the tqdm progress bar while training.
 
     Returns
     -------

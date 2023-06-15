@@ -85,6 +85,11 @@ class FedMedProxOpt(FedMedian):
         tau : float, optional
             Controls the algorithm's degree of adaptability.
             Defaults to 1e-9.
+        proximal_mu : float
+            The weight of the proximal term used in the optimization. 0.0 makes
+            this strategy equivalent to FedAvg, and the higher the coefficient, the more
+            regularization will be used (that is, the client parameters will need to be
+            closer to the server parameters during training).
         """
         super().__init__(
             fraction_fit=fraction_fit,

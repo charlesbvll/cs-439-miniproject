@@ -23,10 +23,9 @@ def main(params) -> None:
         num_clients=params.NUM_CLIENTS,
         num_rounds=params.NUM_ROUNDS,
         iid=params.IID,
-        balance=params.BALANCE,
         optim_name=params.client_optim_name,
         optim_args=params.client_optim_args,
-        stagglers=params.STRAGGLERS_FRACTION,
+        stragglers=params.STRAGGLERS_FRACTION,
         tqdm_disable=params.TQDM_DISABLE,
     )
 
@@ -62,7 +61,6 @@ def main(params) -> None:
 
     file_suffix: str = (
         f"{'_iid' if params.IID else ''}"
-        f"{'_balanced' if params.BALANCE else ''}"
         f"_C={params.NUM_CLIENTS}"
         f"_B={params.BATCH_SIZE}"
         f"_E={params.NUM_EPOCHS}"
