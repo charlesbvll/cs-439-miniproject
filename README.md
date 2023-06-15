@@ -67,7 +67,7 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
   - [ ] SGD 
 
     ```sh
-    python distributed.py -m STRATEGY=fedavg,fedmedian,fedkrum \
+    python distributed.py -m STRATEGY=fedavg,fedmedian \
                              client_optim_name=sgd \
                              client_optim_args.lr=0.01 \
                              server_optim_name=sgd,adagrad,yogi,adam \
@@ -77,10 +77,10 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
                              STRAGGLERS_FRACTION=0.0,0.6 
     ```
     
-  - [ ] Adam 
+  - [x] Adam 
 
     ```sh
-    python distributed.py -m STRATEGY=fedavg,fedmedian,fedkrum \
+    python distributed.py -m STRATEGY=fedavg,fedmedian \
                              client_optim_name=adam \
                              client_optim_args.lr=0.001 \
                              server_optim_name=sgd,adagrad,yogi,adam \
@@ -93,7 +93,7 @@ Project for the CS-439 course (Optimization for Machine Learning). Check-out the
   - [ ] RMSprop
 
     ```sh
-    python distributed.py -m STRATEGY=fedavg,fedmedian,fedkrum \
+    python distributed.py -m STRATEGY=fedavg,fedmedian \
                              client_optim_name=rmsprop \
                              client_optim_args.lr=0.01 \
                              server_optim_name=sgd,adagrad,yogi,adam \
